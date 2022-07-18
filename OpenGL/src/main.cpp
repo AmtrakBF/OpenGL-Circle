@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include <math.h>
-#include "cirlce.h"
+#include "circle.h"
 
 struct ShaderProgramSource
 {
@@ -92,13 +92,9 @@ int main(void)
 {
     GLFWwindow* window;
 
-    int vertSize = (360 / 10) * 2;
-    int indSize = (360 / 10) * 3;
+    int angleIncrement = 10;
 
-    float* vertices = new float[vertSize];
-    unsigned int* indices = new unsigned int[indSize];
-
-    Circle circle = Circle(0, 0, 85, &vertices, &indices);
+    Circle circle = Circle(35, 35, 30, angleIncrement);
 
     /* Initialize the library */
     if (!glfwInit())
@@ -118,30 +114,10 @@ int main(void)
     if (glewInit() != GLEW_OK)
         std::cout << "ERROR" << std::endl;
 
-
-
-    float positions[]{
-         0.0f,  0.0f, 
-
-         0.0f,  0.5f, // top right quad
-         0.3f,  0.4f,
-         0.4f,  0.3f,
-
-
-    };
-    int positionsSize = 9 * 2 * 4;
-
-    /*unsigned int indices[] = {
-        0, 1, 2,
-        0, 2, 3,
-    }*/
-
-    int indicesSize = 3 * 8 * 4;
-
     unsigned int buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, vertSize * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, circle.getVerticesSize() * sizeof(float), circle.getVertices(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
@@ -149,7 +125,7 @@ int main(void)
     unsigned int ibo;
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indSize * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, circle.getIndicesSize() * sizeof(unsigned int), circle.getIndices(), GL_STATIC_DRAW);
 
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
@@ -162,7 +138,7 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
         //glDrawArrays(GL_TRIANGLES, 0, 3); // no index buffer
-        glDrawElements(GL_TRIANGLES, indSize * sizeof(unsigned int), GL_UNSIGNED_INT, nullptr); //--- with buffer
+        glDrawElements(GL_TRIANGLES, circle.getIndicesSize() * sizeof(unsigned int), GL_UNSIGNED_INT, nullptr); //--- with buffer
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -173,8 +149,6 @@ int main(void)
     }
 
     glDeleteProgram(shader);
-    delete[] vertices;
-    delete[] indices;
 
     glfwTerminate();
     return 0;
