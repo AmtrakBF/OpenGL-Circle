@@ -2,7 +2,6 @@
 
 #include <math.h>
 #include <iostream>
-#include <algorithm>
 
 Circle::Circle(int centerPointX, int centerPointY, int radius, int angleIncrement)
 	: centerPointX(centerPointX), centerPointY(centerPointY), radius(radius), angleIncrement(angleIncrement)
